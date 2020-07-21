@@ -470,5 +470,5 @@ Othello.prototype.play_ai = function() {
         }
     }
     var poyo = Math.floor(Math.random() * think.length);
-    this.touch(think[poyo][0], think[poyo][1], this.user);
+    this.touch(think[poyo][0], think[poyo][1]);
 };
