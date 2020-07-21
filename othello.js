@@ -416,7 +416,38 @@ Othello.prototype.touch = function(x, y) {
 
 Othello.prototype.change_turn = function() {
     this.user ^= 1;
-    this.ableclick = true;
+    let mob = this.make_mobility(this.board[this.user], this.board[1 ^ this.user]);
+    if(this.user == this.BLACK) {
+        if(mob[0] > 0 || mob[1] > 0) {
+            this.ableclick = true;
+        } else {
+            this.user ^= 1;
+            mob = this.make_mobility(this.board[this.user], this.board[1 ^ this.user]);
+            if(mob[0] > 0 || mob[1] > 0) {
+                this.paint();
+                var self = this;
+                setTimeout(function() {
+                    self.play_ai();
+                }, 300); 
+            } else {
+            }
+        }
+    } else {
+        if(mob[0] > 0 || mob[1] > 0) {
+            var self = this;
+            setTimeout(function() {
+                self.play_ai();
+            }, 300);
+        } else {
+            this.user ^= 1;
+            mob = this.make_mobility(this.board[this.user], this.board[1 ^ this.user]);
+            if(mob[0] > 0 || mob[1] > 0) {
+                this.paint();
+                this.ableclick = true;
+            } else {
+            }
+        }
+    }
 };
 
 Othello.prototype.pop_count = function(x1, x0) {
@@ -426,4 +457,18 @@ Othello.prototype.pop_count = function(x1, x0) {
     t0 += (t1 & 0x33333333) + ((t1 & 0xcccccccc) >>> 2);
     t0 = (t0 & 0x0f0f0f0f) + ((t0 & 0xf0f0f0f0) >>> 4);
     return t0 * 0x01010101 >>> 24;
+};
+
+Othello.prototype.play_ai = function() {
+    var mob = this.make_mobility(this.board[this.user], this.board[1 ^ this.user]);
+    var think = [];
+    for(var i = 0; i < 8; i++) {
+        for(var j = 0; j < 8; j++) {
+            let pos = i >= 4 ? 1 : 0;
+            let idx = i >= 4 ? i * 8 + j - 32 : i * 8 + j;
+            if((mob[pos] >> idx) & 1) think.push([j, i]);
+        }
+    }
+    var poyo = Math.floor(Math.random() * think.length);
+    this.touch(this.user, think[poyo][0], think[poyo][1]);
 };
